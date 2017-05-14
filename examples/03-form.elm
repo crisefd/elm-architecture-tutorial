@@ -15,16 +15,17 @@ main =
 -- MODEL
 
 
-type alias Model =
+type alias Model_ =
   { name : String
   , password : String
   , passwordAgain : String
+  , some: String
   }
 
 
-model : Model
+model : Model_
 model =
-  Model "" "" ""
+  Model_ "" "" "" ""
 
 
 
@@ -35,9 +36,10 @@ type Msg
     = Name String
     | Password String
     | PasswordAgain String
+    | Some String
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model_-> Model_
 update msg model =
   case msg of
     Name name ->
@@ -48,29 +50,38 @@ update msg model =
 
     PasswordAgain password ->
       { model | passwordAgain = password }
+    _ ->
+      Debug.log( toString( msg))
+      { model | passwordAgain = "XX" }
+
+
 
 
 
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model_ -> Html Msg
 view model =
   div []
     [ input [ type_ "text", placeholder "Name", onInput Name ] []
     , input [ type_ "password", placeholder "Password", onInput Password ] []
     , input [ type_ "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
+    , input [ type_ "password", placeholder "Some", onInput Some ] []
     , viewValidation model
     ]
 
 
-viewValidation : Model -> Html msg
+viewValidation : Model_-> Html msg
 viewValidation model =
   let
-    (color, message) =
-      if model.password == model.passwordAgain then
-        ("green", "OK")
-      else
-        ("red", "Passwords do not match!")
+    disabledButton =
+      if model.password == model.passwordAgain &&
+         model.password /= "" then
+        False
+      else 
+        True
   in
-    div [ style [("color", color)] ] [ text message ]
+    div [] 
+        [ button [ disabled disabledButton ] 
+                 [ text "Submit" ] ]

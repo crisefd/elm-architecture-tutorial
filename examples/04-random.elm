@@ -1,3 +1,6 @@
+-- Read more about this program in the official Elm guide:
+-- https://guide.elm-lang.org/architecture/effects/random.html
+
 import Html exposing (..)
 import Html.Events exposing (..)
 import Random
@@ -18,13 +21,13 @@ main =
 
 
 type alias Model =
-  { dieFace : Int
+  { dieFaces: List Int 
   }
 
 
 init : (Model, Cmd Msg)
 init =
-  (Model 1, Cmd.none)
+  (Model (List.repeat 2 1), Cmd.none)
 
 
 
@@ -33,17 +36,17 @@ init =
 
 type Msg
   = Roll
-  | NewFace Int
+  | NewFaces (List Int)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Roll ->
-      (model, Random.generate NewFace (Random.int 1 6))
-
-    NewFace newFace ->
-      (Model newFace, Cmd.none)
+      (model, Random.generate NewFaces (Random.list 2 (Random.int 1 6)))
+    NewFaces newFaces ->
+      (Model newFaces
+      , Cmd.none)
 
 
 
@@ -57,11 +60,18 @@ subscriptions model =
 
 
 -- VIEW
+aux arg =
+  case arg of
+  Just val -> val
+  _ -> 0
+     
 
 
 view : Model -> Html Msg
 view model =
   div []
-    [ h1 [] [ text (toString model.dieFace) ]
-    , button [ onClick Roll ] [ text "Roll" ]
+    [ h1 [] [ text ( (toString (aux(List.head(model.dieFaces)))) ++   ++
+                     (toString (aux(List.head(List.reverse(model.dieFaces)))) ) ) ]
+    , button [ onClick Roll ] [ text Roll ]
     ]
+
